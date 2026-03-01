@@ -1,5 +1,4 @@
 <?php
-// www/process.php
 session_start();
 
 // получение post-поля
@@ -61,21 +60,16 @@ $line = safe_field($name) . ";" . safe_field($model) . ";" . safe_field($email) 
 $file = __DIR__ . '/data.txt';
 file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
 
-// === НОВАЯ УПРОЩЁННАЯ ЧАСТЬ: API, UserInfo, cookie ===
+// === Часть для 4-ой лабы
 
-// Попытка подключить автолоадер (обычный путь: ../vendor/autoload.php)
-$autoloadRoot = __DIR__ . '/../vendor/autoload.php';
-$autoloadLocal = __DIR__ . '/vendor/autoload.php';
-if (file_exists($autoloadRoot)) {
-    require_once $autoloadRoot;
-} elseif (file_exists($autoloadLocal)) {
-    require_once $autoloadLocal;
+$autoloadt = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($autoload)) {
+    require_once $autoload;
 } else {
     // автолоадер не найден — сохраним ошибку в сессию, но не прерываем работу
     $_SESSION['api_data'] = ['error' => 'vendor/autoload.php not found'];
 }
 
-// Подключаем ApiClient и UserInfo (если файлы есть)
 if (file_exists(__DIR__ . '/ApiClient.php')) {
     require_once __DIR__ . '/ApiClient.php';
 }
@@ -83,7 +77,7 @@ if (file_exists(__DIR__ . '/UserInfo.php')) {
     require_once __DIR__ . '/UserInfo.php';
 }
 
-// Вызов API (если класс ApiClient доступен)
+
 $apiData = ['error' => 'ApiClient not available'];
 if (class_exists('ApiClient')) {
     try {
@@ -95,7 +89,7 @@ if (class_exists('ApiClient')) {
 }
 $_SESSION['api_data'] = $apiData;
 
-// Информация о пользователе (через UserInfo, если есть)
+// Информация о пользователе
 if (class_exists('UserInfo')) {
     $_SESSION['user_info'] = UserInfo::getInfo();
 } else {
@@ -106,7 +100,6 @@ if (class_exists('UserInfo')) {
     ];
 }
 
-// Устанавливаем куку с меткой времени (до редиректа)
 setcookie('last_submission', date('Y-m-d H:i:s'), time() + 3600, "/");
 
 // Сообщение об успехе и редирект
