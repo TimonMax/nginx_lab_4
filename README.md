@@ -20,8 +20,8 @@ http://localhost:8080
 
 ### 1. Клонировать репозиторий
 ```bash
-git clone https://github.com/TimonMax/nginx_lab_3.git
-cd nginx-lab-2
+git clone https://github.com/TimonMax/nginx_lab_4.git
+cd nginx_lab_4
 ```
 ### 2. Запустить контейнеры Docker
 ```bash

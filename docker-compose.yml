@@ -3,7 +3,7 @@ version: "3.9"
 services:
   nginx:
     image: nginx:1.27-alpine
-    container_name: lab3_nginx
+    container_name: lab4_nginx
     depends_on:
       - php
     links:
@@ -16,8 +16,9 @@ services:
 
   php:
     image: php:8.2-fpm
-    container_name: lab3_php
+    container_name: lab4_php
     volumes:
       - ./www:/var/www/html
+      - ./vendor:/var/www/vendor
     expose:
       - "9000"

@@ -6,6 +6,10 @@ function post($name) {
     return isset($_POST[$name]) ? trim($_POST[$name]) : '';
 }
 
+function safe_field($s) {
+    return str_replace(";", ",", $s);
+}
+
 $name = htmlspecialchars(post('name'), ENT_QUOTES | ENT_SUBSTITUTE);
 $model = htmlspecialchars(post('model'), ENT_QUOTES | ENT_SUBSTITUTE);
 $email = post('email'); // проверка отдельно
@@ -51,9 +55,6 @@ $_SESSION['form_data'] = [
     'time' => date('Y-m-d H:i:s')
 ];
 
-function safe_field($s) {
-    return str_replace(";", ",", $s);
-}
 $line = safe_field($name) . ";" . safe_field($model) . ";" . safe_field($email) . ";" . safe_field($service) . ";" . safe_field($warranty) . ";" . safe_field($term) . ";" . date('Y-m-d H:i:s') . "\n";
 
 // Записываем в файл data.txt (в папке www)
@@ -62,22 +63,35 @@ file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
 
 // === Часть для 4-ой лабы
 
-$autoloadt = __DIR__ . '/../vendor/autoload.php';
-if (file_exists($autoload)) {
-    require_once $autoload;
-} else {
-    // автолоадер не найден — сохраним ошибку в сессию, но не прерываем работу
-    $_SESSION['api_data'] = ['error' => 'vendor/autoload.php not found'];
+$autoloadCandidates = [
+    __DIR__ . '/../vendor/autoload.php', // ожидаемый для текущей структуры
+    __DIR__ . '/vendor/autoload.php',
+    __DIR__ . '/../../vendor/autoload.php'
+];
+
+$autoloadFound = null;
+foreach ($autoloadCandidates as $a) {
+    if (is_file($a)) {
+        $autoloadFound = $a;
+        require_once $a;
+        break;
+    }
 }
 
-if (file_exists(__DIR__ . '/ApiClient.php')) {
+if (!$autoloadFound) {
+    $_SESSION['api_data'] = ['error' => 'autoload not found; checked: ' . implode(', ', $autoloadCandidates)];
+} else {
+    // подключили автолоадер
+}
+
+if (is_file(__DIR__ . '/ApiClient.php')) {
     require_once __DIR__ . '/ApiClient.php';
 }
-if (file_exists(__DIR__ . '/UserInfo.php')) {
+if (is_file(__DIR__ . '/UserInfo.php')) {
     require_once __DIR__ . '/UserInfo.php';
 }
 
-
+// API 
 $apiData = ['error' => 'ApiClient not available'];
 if (class_exists('ApiClient')) {
     try {
@@ -102,7 +116,7 @@ if (class_exists('UserInfo')) {
 
 setcookie('last_submission', date('Y-m-d H:i:s'), time() + 3600, "/");
 
-// Сообщение об успехе и редирект
+
 $_SESSION['success'] = 'Данные успешно сохранены';
 header('Location: index.php');
 exit();

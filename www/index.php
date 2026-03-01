@@ -85,7 +85,6 @@ unset($_SESSION['errors'], $_SESSION['success']);
               </li>
             <?php endforeach; ?>
           </ul>
-          <p><a href="api_full.php">Показать полный ответ API</a></p>
         <?php else: ?>
           <pre><?= htmlspecialchars(print_r($api_data, true), ENT_QUOTES|ENT_SUBSTITUTE) ?></pre>
         <?php endif; ?>
