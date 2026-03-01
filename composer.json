@@ -1,0 +1,12 @@
+{
+    "name": "79211/nginx_lab_4",
+    "authors": [
+        {
+            "name": "TimonMax",
+            "email": "timonmaxu@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.10"
+    }
+}
