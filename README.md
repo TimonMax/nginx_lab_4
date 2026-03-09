@@ -51,3 +51,7 @@ http://localhost:8080/phpinfo.php
 ```www/data.txt``` — файл с сохранёнными записями (создаётся автоматически при первой записи)
 
 ```nginx/default.conf``` — файл для обработки PHP
+
+```www/UserInfo.php``` — информация о пользователе
+
+```www/ApiClient.php``` — работа с Api

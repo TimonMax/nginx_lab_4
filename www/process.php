@@ -63,26 +63,13 @@ file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
 
 // === Часть для 4-ой лабы
 
-$autoloadCandidates = [
-    __DIR__ . '/../vendor/autoload.php', // ожидаемый для текущей структуры
-    __DIR__ . '/vendor/autoload.php',
-    __DIR__ . '/../../vendor/autoload.php'
-];
-
-$autoloadFound = null;
-foreach ($autoloadCandidates as $a) {
-    if (is_file($a)) {
-        $autoloadFound = $a;
-        require_once $a;
-        break;
-    }
-}
-
-if (!$autoloadFound) {
-    $_SESSION['api_data'] = ['error' => 'autoload not found; checked: ' . implode(', ', $autoloadCandidates)];
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (is_file($autoload)) {
+    require_once $autoload;
 } else {
-    // подключили автолоадер
+    $_SESSION['api_data'] = ['error' => 'autoload not found; expected: ' . $autoload];
 }
+
 
 if (is_file(__DIR__ . '/ApiClient.php')) {
     require_once __DIR__ . '/ApiClient.php';
@@ -95,8 +82,9 @@ if (is_file(__DIR__ . '/UserInfo.php')) {
 $apiData = ['error' => 'ApiClient not available'];
 if (class_exists('ApiClient')) {
     try {
-        $api = new ApiClient(['timeout' => 5.0]);
-        $apiData = $api->request('https://dummyjson.com/products/category/smartphones');
+
+        $api = new ApiClient(['timeout' => 10.0, 'connect_timeout' => 5.0, 'retries' => 1]);
+        $apiData = $api->request('https://dummyjson.com/products/category/smartphones', ['timeout' => 30.0, 'connect_timeout' => 10.0, 'verify' => false]);
     } catch (\Throwable $e) {
         $apiData = ['error' => $e->getMessage()];
     }
@@ -115,7 +103,6 @@ if (class_exists('UserInfo')) {
 }
 
 setcookie('last_submission', date('Y-m-d H:i:s'), time() + 3600, "/");
-
 
 $_SESSION['success'] = 'Данные успешно сохранены';
 header('Location: index.php');
